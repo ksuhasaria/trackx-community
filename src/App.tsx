@@ -329,7 +329,7 @@ const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number 
   const [viewMode, setViewMode] = useState<'cluster' | 'heatmap'>('cluster');
 
   return (
-    <div className="map-container" style={{ height: 'calc(100vh - 240px)', marginTop: '10px', background: '#050505' }}>
+    <div className="map-container" style={{ height: 'calc(100vh - 210px)', marginTop: '4px', background: '#050505' }}>
       <APIProvider apiKey={API_KEY} libraries={['visualization']}>
         <Map
           style={{ width: '100%', height: '100%' }}
@@ -592,48 +592,51 @@ const AppContent: React.FC = () => {
         bottom: 0,
         left: 0,
         right: 0,
-        padding: "12px 20px calc(12px + var(--safe-area-bottom))",
-        background: 'rgba(10, 10, 10, 0.8)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
+        padding: "10px 10px calc(14px + var(--safe-area-bottom))",
+        background: 'rgba(5, 5, 5, 0.9)',
+        backdropFilter: 'blur(25px)',
+        WebkitBackdropFilter: 'blur(25px)',
         borderTop: '1px solid var(--glass-border)',
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
         zIndex: 1000
       }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <Newspaper size={currentPath === '/' ? 26 : 24} />
-            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Feed</span>
+        <Link to="/" style={{ textDecoration: 'none', flex: 1 }}>
+          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <Newspaper size={currentPath === '/' ? 26 : 22} strokeWidth={currentPath === '/' ? 2.5 : 2} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Feed</span>
           </motion.button>
         </Link>
 
-        <Link to="/polls" style={{ textDecoration: 'none' }}>
-          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/polls' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <BarChart2 size={currentPath === '/polls' ? 26 : 24} />
-            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Polls</span>
+        <Link to="/polls" style={{ textDecoration: 'none', flex: 1 }}>
+          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/polls' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <BarChart2 size={currentPath === '/polls' ? 26 : 22} strokeWidth={currentPath === '/polls' ? 2.5 : 2} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Polls</span>
           </motion.button>
         </Link>
 
-        <Link to="/map" style={{ textDecoration: 'none' }}>
-          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <MapIcon size={currentPath === '/map' ? 26 : 24} />
-            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Map</span>
+        <Link to="/map" style={{ textDecoration: 'none', flex: 1 }}>
+          <motion.button
+            whileTap={{ scale: 0.85 }}
+            style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
+          >
+            <MapIcon size={currentPath === '/map' ? 26 : 22} strokeWidth={currentPath === '/map' ? 2.5 : 2} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Map</span>
           </motion.button>
         </Link>
 
-        <Link to="/leaderboard" style={{ textDecoration: 'none' }}>
-          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/leaderboard' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <Trophy size={currentPath === '/leaderboard' ? 26 : 24} />
-            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Ranks</span>
+        <Link to="/leaderboard" style={{ textDecoration: 'none', flex: 1 }}>
+          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/leaderboard' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <Trophy size={currentPath === '/leaderboard' ? 26 : 22} strokeWidth={currentPath === '/leaderboard' ? 2.5 : 2} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Ranks</span>
           </motion.button>
         </Link>
 
-        <Link to="/admin" style={{ textDecoration: 'none' }}>
-          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/admin' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <User size={currentPath === '/admin' ? 26 : 24} />
-            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Admin</span>
+        <Link to="/admin" style={{ textDecoration: 'none', flex: 1 }}>
+          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/admin' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <User size={currentPath === '/admin' ? 26 : 22} strokeWidth={currentPath === '/admin' ? 2.5 : 2} />
+            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Admin</span>
           </motion.button>
         </Link>
       </nav>
