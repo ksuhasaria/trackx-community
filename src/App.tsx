@@ -411,20 +411,42 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  // Simulate incoming GPS data across India
+  // Simulate incoming GPS data grouped around major Indian cities (ensuring land coordinates)
   useEffect(() => {
-    const initialDrivers = Array.from({ length: 300 }, (_, i) => ({
-      id: i,
-      lat: 20.5937 + (Math.random() - 0.5) * 18,
-      lng: 78.9629 + (Math.random() - 0.5) * 18
-    }));
+    const hubs = [
+      { lat: 28.6139, lng: 77.2090 }, // Delhi
+      { lat: 19.0760, lng: 72.8777 }, // Mumbai
+      { lat: 12.9716, lng: 77.5946 }, // Bangalore
+      { lat: 13.0827, lng: 80.2707 }, // Chennai
+      { lat: 22.5726, lng: 88.3639 }, // Kolkata
+      { lat: 17.3850, lng: 78.4867 }, // Hyderabad
+      { lat: 18.5204, lng: 73.8567 }, // Pune
+      { lat: 23.0225, lng: 72.5714 }, // Ahmedabad
+      { lat: 26.9124, lng: 75.7873 }, // Jaipur
+      { lat: 26.8467, lng: 80.9462 }, // Lucknow
+      { lat: 21.1458, lng: 79.0882 }, // Nagpur
+      { lat: 25.5941, lng: 85.1376 }, // Patna
+      { lat: 23.2599, lng: 77.4126 }, // Bhopal
+      { lat: 26.1445, lng: 91.7362 }  // Guwahati
+    ];
+
+    const initialDrivers = Array.from({ length: 300 }, (_, i) => {
+      const hub = hubs[Math.floor(Math.random() * hubs.length)];
+      // Apply a random spread of ~50km around the city hub
+      return {
+        id: i,
+        lat: hub.lat + (Math.random() - 0.5) * 1.0,
+        lng: hub.lng + (Math.random() - 0.5) * 1.0
+      };
+    });
     setDrivers(initialDrivers);
 
     const interval = setInterval(() => {
       setDrivers(prev => prev.map(d => ({
         ...d,
-        lat: d.lat + (Math.random() - 0.5) * 0.1,
-        lng: d.lng + (Math.random() - 0.5) * 0.1
+        // Cars move slightly over time
+        lat: d.lat + (Math.random() - 0.5) * 0.02,
+        lng: d.lng + (Math.random() - 0.5) * 0.02
       })));
     }, 3000);
     return () => clearInterval(interval);
