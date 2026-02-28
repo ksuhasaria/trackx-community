@@ -3,8 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Newspaper, BarChart2, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
-import { GoogleMapsOverlay } from '@deck.gl/google-maps';
-import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import './index.css';
 
 // --- Types ---
@@ -209,51 +207,7 @@ const Markers = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
   );
 };
 
-const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng: number }[], visible: boolean }) => {
-  const map = useMap();
-  const [overlay, setOverlay] = React.useState<GoogleMapsOverlay | null>(null);
 
-  React.useEffect(() => {
-    if (!map) return;
-    const newOverlay = new GoogleMapsOverlay({ interleaved: true, layers: [] });
-    newOverlay.setMap(map);
-    setOverlay(newOverlay);
-    return () => newOverlay.setMap(null);
-  }, [map]);
-
-  React.useEffect(() => {
-    if (!overlay) return;
-
-    if (!visible) {
-      overlay.setProps({ layers: [] });
-      return;
-    }
-
-    const hexagonLayer = new HexagonLayer({
-      id: 'hexagon-layer',
-      data: drivers,
-      getPosition: (d: any) => [d.lng, d.lat],
-      getElevationWeight: () => 1,
-      elevationScale: 5000,
-      extruded: false, // Turn off extrusion for clean top-down 2D view
-      radius: 60000, // 60km bins for clearer Indian subcontinent overview
-      opacity: 0.85,
-      coverage: 0.95,
-      colorRange: [
-        [32, 18, 77],
-        [74, 33, 150],
-        [125, 48, 204],
-        [186, 60, 235],
-        [224, 90, 255],
-        [255, 170, 255]
-      ]
-    });
-
-    overlay.setProps({ layers: [hexagonLayer] });
-  }, [overlay, drivers, visible]);
-
-  return null;
-};
 
 const Leaderboard = () => {
   const [ranks] = useState([
@@ -326,8 +280,6 @@ const Leaderboard = () => {
 };
 
 const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number }[] }) => {
-  const [viewMode, setViewMode] = useState<'cluster' | 'heatmap'>('cluster');
-
   return (
     <div className="map-container" style={{ height: 'calc(100vh - 210px)', marginTop: '4px', background: '#050505' }}>
       <APIProvider apiKey={API_KEY} libraries={['visualization']}>
@@ -340,58 +292,11 @@ const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number 
           disableDefaultUI={true}
           styles={mapStyles}
         >
-          <Markers drivers={drivers} visible={viewMode === 'cluster'} />
-          <Heatmap drivers={drivers} visible={viewMode === 'heatmap'} />
+          <Markers drivers={drivers} visible={true} />
         </Map>
       </APIProvider>
 
-      {/* View Toggle */}
-      <div style={{
-        position: 'absolute',
-        bottom: '80px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        display: 'flex',
-        background: 'rgba(0,0,0,0.6)',
-        backdropFilter: 'blur(10px)',
-        borderRadius: '100px',
-        padding: '4px',
-        border: '1px solid var(--glass-border)',
-        zIndex: 10
-      }}>
-        <button
-          onClick={() => setViewMode('cluster')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '100px',
-            border: 'none',
-            background: viewMode === 'cluster' ? 'var(--accent-primary)' : 'transparent',
-            color: 'white',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.3s'
-          }}
-        >
-          CLUSTERS
-        </button>
-        <button
-          onClick={() => setViewMode('heatmap')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '100px',
-            border: 'none',
-            background: viewMode === 'heatmap' ? 'var(--accent-primary)' : 'transparent',
-            color: 'white',
-            fontSize: '0.75rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            transition: 'all 0.3s'
-          }}
-        >
-          HEXBIN
-        </button>
-      </div>
+
 
       {/* Top Overlay */}
       <div className="map-overlay-top">
