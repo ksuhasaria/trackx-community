@@ -414,6 +414,7 @@ const AppContent: React.FC = () => {
   // Simulate incoming GPS data grouped around major Indian cities (ensuring land coordinates)
   useEffect(() => {
     const hubs = [
+      // existing major cities
       { lat: 28.6139, lng: 77.2090 }, // Delhi
       { lat: 19.0760, lng: 72.8777 }, // Mumbai
       { lat: 12.9716, lng: 77.5946 }, // Bangalore
@@ -427,10 +428,69 @@ const AppContent: React.FC = () => {
       { lat: 21.1458, lng: 79.0882 }, // Nagpur
       { lat: 25.5941, lng: 85.1376 }, // Patna
       { lat: 23.2599, lng: 77.4126 }, // Bhopal
-      { lat: 26.1445, lng: 91.7362 }  // Guwahati
+      { lat: 26.1445, lng: 91.7362 }, // Guwahati
+
+      // Dense South India (Karnataka, Tamil Nadu, Andhra, Telangana, Kerala)
+      { lat: 12.2958, lng: 76.6394 }, // Mysore
+      { lat: 12.8700, lng: 74.8800 }, // Mangalore
+      { lat: 15.3647, lng: 75.1240 }, // Hubli
+      { lat: 15.8497, lng: 74.4977 }, // Belgaum
+      { lat: 17.3297, lng: 76.8343 }, // Gulbarga
+      { lat: 11.0168, lng: 76.9558 }, // Coimbatore
+      { lat: 9.9252, lng: 78.1198 },  // Madurai
+      { lat: 10.7905, lng: 78.7047 }, // Tiruchirappalli
+      { lat: 11.6643, lng: 78.1460 }, // Salem
+      { lat: 8.7139, lng: 77.7567 },  // Tirunelveli
+      { lat: 11.3410, lng: 77.7172 }, // Erode
+      { lat: 12.9165, lng: 79.1325 }, // Vellore
+      { lat: 17.6868, lng: 83.2185 }, // Visakhapatnam
+      { lat: 16.5062, lng: 80.6480 }, // Vijayawada
+      { lat: 16.3067, lng: 80.4365 }, // Guntur
+      { lat: 14.4426, lng: 79.9865 }, // Nellore
+      { lat: 15.8281, lng: 78.0373 }, // Kurnool
+      { lat: 17.0005, lng: 81.8040 }, // Rajahmundry
+      { lat: 13.6288, lng: 79.4192 }, // Tirupati
+      { lat: 17.9689, lng: 79.5941 }, // Warangal
+      { lat: 18.6704, lng: 78.0936 }, // Nizamabad
+      { lat: 18.4386, lng: 79.1288 }, // Karimnagar
+      { lat: 17.2473, lng: 80.1514 }, // Khammam
+      { lat: 8.5241, lng: 76.9366 },  // Thiruvananthapuram
+      { lat: 9.9312, lng: 76.2673 },  // Kochi
+      { lat: 11.2588, lng: 75.7804 }, // Kozhikode
+      { lat: 8.8932, lng: 76.6141 },  // Kollam
+      { lat: 10.5276, lng: 76.2144 }, // Thrissur
+      { lat: 9.4981, lng: 76.3388 },  // Alappuzha
+
+      // Additional North, West & East
+      { lat: 30.7333, lng: 76.7794 }, // Chandigarh
+      { lat: 30.9010, lng: 75.8573 }, // Ludhiana
+      { lat: 31.6340, lng: 74.8723 }, // Amritsar
+      { lat: 30.3165, lng: 78.0322 }, // Dehradun
+      { lat: 27.1767, lng: 78.0081 }, // Agra
+      { lat: 25.3176, lng: 82.9739 }, // Varanasi
+      { lat: 26.4499, lng: 80.3319 }, // Kanpur
+      { lat: 25.4358, lng: 81.8463 }, // Allahabad
+      { lat: 21.1702, lng: 72.8311 }, // Surat
+      { lat: 22.3072, lng: 73.1812 }, // Vadodara
+      { lat: 22.3039, lng: 70.8022 }, // Rajkot
+      { lat: 19.9975, lng: 73.7898 }, // Nashik
+      { lat: 19.8762, lng: 75.3433 }, // Aurangabad
+      { lat: 20.2961, lng: 85.8245 }, // Bhubaneswar
+      { lat: 20.4625, lng: 85.8828 }, // Cuttack
+      { lat: 23.3441, lng: 85.3096 }, // Ranchi
+      { lat: 22.8046, lng: 86.2029 }, // Jamshedpur
+      { lat: 23.7957, lng: 86.4304 }, // Dhanbad
+      { lat: 19.1320, lng: 82.0350 }, // Jagdalpur
+      { lat: 21.2514, lng: 81.6296 }, // Raipur
+      { lat: 26.2124, lng: 78.1772 }, // Gwalior
+      { lat: 22.7196, lng: 75.8577 }, // Indore
+      { lat: 23.1815, lng: 79.9864 }, // Jabalpur
+      { lat: 24.5854, lng: 73.7125 }, // Udaipur
+      { lat: 26.2389, lng: 73.0243 }, // Jodhpur
+      { lat: 28.0229, lng: 73.3119 }  // Bikaner
     ];
 
-    const initialDrivers = Array.from({ length: 300 }, (_, i) => {
+    const initialDrivers = Array.from({ length: 1200 }, (_, i) => {
       const hub = hubs[Math.floor(Math.random() * hubs.length)];
       // Apply a random spread of ~50km around the city hub
       return {
