@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { LayoutGroup, motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Send, Plus, Info, Zap, Layers, Bell } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell } from 'lucide-react';
 import './index.css';
 
 // --- Types ---
@@ -53,7 +53,7 @@ const FeedCard = ({ item }: { item: FeedItem }) => (
   </motion.div>
 );
 
-const PollView = ({ poll, onVote, isAdmin }: { poll: Poll, onVote: (id: string) => void, isAdmin?: boolean }) => {
+const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }) => {
   const [votedId, setVotedId] = useState<string | null>(null);
 
   const handleVote = (id: string) => {
@@ -132,7 +132,7 @@ const PollView = ({ poll, onVote, isAdmin }: { poll: Poll, onVote: (id: string) 
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'feed' | 'polls' | 'admin'>('feed');
-  const [feed, setFeed] = useState<FeedItem[]>([
+  const [feed] = useState<FeedItem[]>([
     {
       id: '1',
       user: 'TurboRacer',
