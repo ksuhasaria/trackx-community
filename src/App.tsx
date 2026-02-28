@@ -215,7 +215,7 @@ const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
 
   React.useEffect(() => {
     if (!map) return;
-    const newOverlay = new GoogleMapsOverlay({ layers: [] });
+    const newOverlay = new GoogleMapsOverlay({ interleaved: true, layers: [] });
     newOverlay.setMap(map);
     setOverlay(newOverlay);
     return () => newOverlay.setMap(null);
@@ -235,8 +235,8 @@ const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
       getPosition: (d: any) => [d.lng, d.lat],
       getElevationWeight: () => 1,
       elevationScale: 5000,
-      extruded: true,
-      radius: 40000, // 40km bins
+      extruded: false, // Turn off extrusion for clean top-down 2D view
+      radius: 60000, // 60km bins for clearer Indian subcontinent overview
       opacity: 0.85,
       coverage: 0.95,
       colorRange: [
