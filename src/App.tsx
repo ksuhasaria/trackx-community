@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, Zap, Layers, Map as MapIcon, Radio, Trophy, Timer, Star, CheckCircle } from 'lucide-react';
+import { Newspaper, BarChart2, Map as MapIcon, Radio, Trophy, Timer, Star, CheckCircle, ThumbsUp, Flame, Megaphone } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
@@ -19,7 +19,12 @@ export interface FeedItem {
   content: string;
   time: string;
   image?: string;
-  likes: number;
+  reactions: {
+    like: number;
+    respect: number;
+    alert: number;
+  };
+  userReactionType?: 'like' | 'respect' | 'alert';
 }
 
 interface Poll {
@@ -55,7 +60,7 @@ const mapStyles = [
 
 // --- Components ---
 
-const FeedCard = ({ item }: { item: FeedItem }) => (
+const FeedCard = ({ item, onReact }: { item: FeedItem, onReact: (id: string, type: 'like' | 'respect' | 'alert') => void }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -78,8 +83,15 @@ const FeedCard = ({ item }: { item: FeedItem }) => (
       />
     )}
     <div style={{ display: 'flex', gap: '20px', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Zap size={16} color="var(--accent-primary)" /> {item.likes}</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Layers size={16} /> 12</div>
+      <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'like')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'like' ? '#fbbf24' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+        <ThumbsUp size={16} fill={item.userReactionType === 'like' ? '#fbbf24' : 'none'} color={item.userReactionType === 'like' ? '#fbbf24' : 'var(--text-secondary)'} /> {item.reactions.like}
+      </motion.button>
+      <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'respect')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'respect' ? '#f97316' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+        <Flame size={16} fill={item.userReactionType === 'respect' ? '#f97316' : 'none'} color={item.userReactionType === 'respect' ? '#f97316' : 'var(--text-secondary)'} /> {item.reactions.respect}
+      </motion.button>
+      <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'alert')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'alert' ? '#3b82f6' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+        <Megaphone size={16} fill={item.userReactionType === 'alert' ? '#3b82f6' : 'none'} color={item.userReactionType === 'alert' ? '#3b82f6' : 'var(--text-secondary)'} /> {item.reactions.alert}
+      </motion.button>
     </div>
   </motion.div>
 );
@@ -474,7 +486,7 @@ const AppContent: React.FC = () => {
       systemType: 'midnight_run',
       content: 'Someone just completed a 45km Midnight Run across the city. The roads belong to the night riders.',
       time: '10m ago',
-      likes: 104
+      reactions: { like: 104, respect: 12, alert: 0 }
     },
     {
       id: '1',
@@ -482,7 +494,7 @@ const AppContent: React.FC = () => {
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop',
       content: 'Just crossed the new Mumbai-Pune Expressway section. The road is buttery smooth but watch out for speed interceptors near the Lonavala exit! 🚓',
       time: '12m ago',
-      likes: 342
+      reactions: { like: 342, respect: 45, alert: 12 }
     },
     {
       id: 'sys-2',
@@ -490,7 +502,7 @@ const AppContent: React.FC = () => {
       systemType: 'road_warrior',
       content: 'Epic journey logged! A driver just clocked 350km in a single sitting. True Road Warrior.',
       time: '34m ago',
-      likes: 541
+      reactions: { like: 12, respect: 541, alert: 0 }
     },
     {
       id: '2',
@@ -499,7 +511,7 @@ const AppContent: React.FC = () => {
       content: 'Monsoon has officially hit the western ghats. Visibility is dropping fast near Munnar. Drive safe everyone, use those fog lamps! 🌧️🏔️',
       time: '45m ago',
       image: 'https://images.unsplash.com/photo-1518081461904-9d8f13734f1a?w=600&h=400&fit=crop',
-      likes: 890
+      reactions: { like: 890, respect: 22, alert: 400 }
     },
     {
       id: 'sys-3',
@@ -507,7 +519,7 @@ const AppContent: React.FC = () => {
       systemType: 'smooth_operator',
       content: 'Flawless driving detected! 62km driven with a 100% safety rating. Smooth Operator.',
       time: '2h ago',
-      likes: 89
+      reactions: { like: 89, respect: 154, alert: 0 }
     },
     {
       id: '3',
@@ -515,7 +527,7 @@ const AppContent: React.FC = () => {
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
       content: 'Stuck at the Hosur border crossing for the last 2 hours. Commercial tax checking is heavy today. Any other truckers passing through here?',
       time: '1h ago',
-      likes: 124
+      reactions: { like: 20, respect: 2, alert: 124 }
     },
     {
       id: 'sys-4',
@@ -523,7 +535,7 @@ const AppContent: React.FC = () => {
       systemType: 'canyon_carver',
       content: 'Hitting the apexes! A driver just navigated 24 hairpins on this Canyon Carver route.',
       time: '3h ago',
-      likes: 211
+      reactions: { like: 211, respect: 432, alert: 0 }
     },
     {
       id: '4',
@@ -531,7 +543,7 @@ const AppContent: React.FC = () => {
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
       content: 'Just got the 10,000km service done on the Creta. Cost me ₹6,500 at the official service center. Does that sound right or did I get overcharged?',
       time: '3h ago',
-      likes: 56
+      reactions: { like: 56, respect: 0, alert: 12 }
     },
     {
       id: 'sys-5',
@@ -539,7 +551,7 @@ const AppContent: React.FC = () => {
       systemType: 'city_pulse',
       content: 'Today\'s TrackX Pulse: Peak traffic avoided by 60% of tracked users.',
       time: '5h ago',
-      likes: 1205
+      reactions: { like: 1205, respect: 104, alert: 0 }
     },
     {
       id: '5',
@@ -547,7 +559,7 @@ const AppContent: React.FC = () => {
       avatar: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop',
       content: '🚨 Traffic Alert: Major waterlogging reported on ORR Bellandur (Bangalore). Avoid the route if possible. We are seeing average speeds drop below 5km/h on the live map.',
       time: '4h ago',
-      likes: 1205
+      reactions: { like: 200, respect: 0, alert: 1205 }
     }
   ]);
 
@@ -597,7 +609,7 @@ const AppContent: React.FC = () => {
       content,
       image,
       time: 'Just now',
-      likes: 0
+      reactions: { like: 0, respect: 0, alert: 0 }
     };
     setFeed(prev => [newPost, ...prev]);
   };
@@ -609,6 +621,32 @@ const AppContent: React.FC = () => {
         ...p,
         totalVotes: p.totalVotes + 1,
         options: p.options.map(o => o.id === optId ? { ...o, votes: o.votes + 1 } : o)
+      };
+    }));
+  };
+
+  const handleReaction = (postId: string, type: 'like' | 'respect' | 'alert') => {
+    setFeed(prev => prev.map(item => {
+      if (item.id !== postId) return item;
+
+      const newReactions = { ...item.reactions };
+      let newUserReactionType = item.userReactionType;
+
+      if (item.userReactionType === type) {
+        newReactions[type] -= 1;
+        newUserReactionType = undefined;
+      } else {
+        if (item.userReactionType) {
+          newReactions[item.userReactionType] -= 1;
+        }
+        newReactions[type] += 1;
+        newUserReactionType = type;
+      }
+
+      return {
+        ...item,
+        reactions: newReactions,
+        userReactionType: newUserReactionType
       };
     }));
   };
@@ -649,7 +687,7 @@ const AppContent: React.FC = () => {
                     <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
                   </div>
                 </div>
-                {feed.map(item => item.type === 'system' ? <SystemFeedCard key={item.id} item={item} /> : <FeedCard key={item.id} item={item} />)}
+                {feed.map(item => item.type === 'system' ? <SystemFeedCard key={item.id} item={item} onReact={handleReaction} /> : <FeedCard key={item.id} item={item} onReact={handleReaction} />)}
                 <CreatePost onPost={handlePost} />
               </motion.div>
             } />

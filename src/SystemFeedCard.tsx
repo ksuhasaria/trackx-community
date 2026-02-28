@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Zap, Activity, Route, ShieldCheck, TrendingUp } from 'lucide-react';
+import { Activity, Route, ShieldCheck, TrendingUp, ThumbsUp, Flame, Megaphone } from 'lucide-react';
 import type { FeedItem } from './App';
 
 const MidnightRunSVG = () => (
@@ -61,7 +61,7 @@ const CanyonCarverSVG = () => (
     </svg>
 );
 
-export const SystemFeedCard = ({ item }: { item: FeedItem }) => {
+export const SystemFeedCard = ({ item, onReact }: { item: FeedItem, onReact: (id: string, type: 'like' | 'respect' | 'alert') => void }) => {
     const renderVisuals = () => {
         switch (item.systemType) {
             case 'midnight_run':
@@ -148,8 +148,16 @@ export const SystemFeedCard = ({ item }: { item: FeedItem }) => {
 
             {renderVisuals()}
 
-            <div style={{ display: 'flex', gap: '20px', marginTop: '20px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}><Zap size={16} color="var(--text-secondary)" /> {item.likes}</div>
+            <div style={{ display: 'flex', gap: '20px', marginTop: '16px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'like')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'like' ? '#fbbf24' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+                    <ThumbsUp size={16} fill={item.userReactionType === 'like' ? '#fbbf24' : 'none'} color={item.userReactionType === 'like' ? '#fbbf24' : 'var(--text-secondary)'} /> {item.reactions?.like || 0}
+                </motion.button>
+                <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'respect')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'respect' ? '#f97316' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+                    <Flame size={16} fill={item.userReactionType === 'respect' ? '#f97316' : 'none'} color={item.userReactionType === 'respect' ? '#f97316' : 'var(--text-secondary)'} /> {item.reactions?.respect || 0}
+                </motion.button>
+                <motion.button whileTap={{ scale: 0.9 }} onClick={() => onReact(item.id, 'alert')} style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: item.userReactionType === 'alert' ? '#3b82f6' : 'var(--text-secondary)', cursor: 'pointer', padding: 0 }}>
+                    <Megaphone size={16} fill={item.userReactionType === 'alert' ? '#3b82f6' : 'none'} color={item.userReactionType === 'alert' ? '#3b82f6' : 'var(--text-secondary)'} /> {item.reactions?.alert || 0}
+                </motion.button>
             </div>
         </motion.div>
     );
