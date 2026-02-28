@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell, Map as MapIcon, Radio, Navigation } from 'lucide-react';
+import { Newspaper, BarChart2, User, Plus, Zap, Layers, Bell, Map as MapIcon, Radio } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
@@ -334,9 +334,12 @@ const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number 
   );
 };
 
-const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'feed' | 'polls' | 'map' | 'admin'>('feed');
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+
+const AppContent: React.FC = () => {
   const [drivers, setDrivers] = useState<{ id: number, lat: number, lng: number }[]>([]);
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   // Simulate incoming GPS data across India
   useEffect(() => {
@@ -405,12 +408,10 @@ const App: React.FC = () => {
       active: true,
       totalVotes: 0
     });
-    setActiveTab('polls');
   };
 
   return (
     <>
-      {/* Header */}
       <header style={{
         padding: '24px 20px',
         display: 'flex',
@@ -433,126 +434,78 @@ const App: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="scroll-container">
         <AnimatePresence mode="wait">
-          {activeTab === 'feed' && (
-            <motion.div
-              key="feed"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Feed</h3>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
-                </div>
-              </div>
-              {feed.map(item => <FeedCard key={item.id} item={item} />)}
-            </motion.div>
-          )}
-
-          {activeTab === 'polls' && (
-            <motion.div
-              key="polls"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '20px' }}>Active Polls</h3>
-              <PollView poll={poll} onVote={handleVote} />
-
-              <div style={{ marginTop: '24px', padding: '20px' }} className="glass-panel">
-                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                  <Info size={20} color="var(--accent-primary)" style={{ flexShrink: 0 }} />
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                    Results are calculated in real-time. Polls expire every 24 hours to keep the competition fresh!
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'map' && (
-            <motion.div
-              key="map"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Network</h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '15px' }}>Tracking active vehicle telemetry across the region.</p>
-              <LiveMap drivers={drivers} />
-            </motion.div>
-          )}
-
-          {activeTab === 'admin' && (
-            <motion.div
-              key="admin"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
-            >
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Creator Dashboard</h3>
-              <div className="glass-panel" style={{ padding: '20px' }}>
-                <p style={{ fontWeight: 600, marginBottom: '16px' }}>Start a New Poll</p>
-                <input
-                  placeholder="Ask something interesting..."
-                  type="text"
-                  style={{
-                    width: '100%',
-                    padding: '12px 16px',
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid var(--glass-border)',
-                    borderRadius: '12px',
-                    color: 'white',
-                    marginBottom: '12px'
-                  }}
-                />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      placeholder="Option 1"
-                      style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '10px', color: 'white' }}
-                    />
-                  </div>
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      placeholder="Option 2"
-                      style={{ width: '100%', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', border: '1px solid var(--glass-border)', borderRadius: '10px', color: 'white' }}
-                    />
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Feed</h3>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
                   </div>
                 </div>
-                <button
-                  onClick={() => postPoll("Upcoming Night Layout?", ["Neon Heights", "Carbon Valley", "Thunder Road"])}
-                  style={{
-                    width: '100%',
-                    marginTop: '20px',
-                    background: 'var(--accent-primary)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '14px',
-                    borderRadius: '12px',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxShadow: 'var(--shadow-neon)'
-                  }}>
-                  <Plus size={18} /> CREATE POLL
-                </button>
-              </div>
-            </motion.div>
-          )}
+                {feed.map(item => <FeedCard key={item.id} item={item} />)}
+              </motion.div>
+            } />
+
+            <Route path="/polls" element={
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '20px' }}>Active Polls</h3>
+                <PollView poll={poll} onVote={handleVote} />
+                <div style={{ marginTop: '24px', padding: '20px' }} className="glass-panel">
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                      Results are calculated in real-time. Polls expire every 24 hours to keep the competition fresh!
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            } />
+
+            <Route path="/map" element={
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Network</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '15px' }}>Tracking active vehicle telemetry across the region.</p>
+                <LiveMap drivers={drivers} />
+              </motion.div>
+            } />
+
+            <Route path="/admin" element={
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
+              >
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Creator Dashboard</h3>
+                <div className="glass-panel" style={{ padding: '20px' }}>
+                  <p style={{ fontWeight: 600, marginBottom: '16px' }}>Start a New Poll</p>
+                  <input placeholder="Ask something interesting..." type="text" style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white', marginBottom: '12px' }} />
+                  <button onClick={() => postPoll("Upcoming Night Layout?", ["Neon Heights", "Carbon Valley", "Thunder Road"])} style={{ width: '100%', marginTop: '20px', background: 'var(--accent-primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'var(--shadow-neon)' }}>
+                    <Plus size={18} /> CREATE POLL
+                  </button>
+                </div>
+              </motion.div>
+            } />
+          </Routes>
         </AnimatePresence>
       </main>
 
-      {/* Navigation Bar */}
       <nav style={{
         position: 'fixed',
         bottom: 0,
@@ -568,44 +521,42 @@ const App: React.FC = () => {
         alignItems: 'center',
         zIndex: 1000
       }}>
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setActiveTab('feed')}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: activeTab === 'feed' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
-        >
-          <Newspaper size={activeTab === 'feed' ? 26 : 24} />
-          <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Feed</span>
-        </motion.button>
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <Newspaper size={currentPath === '/' ? 26 : 24} />
+            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Feed</span>
+          </motion.button>
+        </Link>
 
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setActiveTab('polls')}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: activeTab === 'polls' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
-        >
-          <BarChart2 size={activeTab === 'polls' ? 26 : 24} />
-          <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Polls</span>
-        </motion.button>
+        <Link to="/polls" style={{ textDecoration: 'none' }}>
+          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/polls' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <BarChart2 size={currentPath === '/polls' ? 26 : 24} />
+            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Polls</span>
+          </motion.button>
+        </Link>
 
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setActiveTab('map')}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: activeTab === 'map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
-        >
-          <MapIcon size={activeTab === 'map' ? 26 : 24} />
-          <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Map</span>
-        </motion.button>
+        <Link to="/map" style={{ textDecoration: 'none' }}>
+          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <MapIcon size={currentPath === '/map' ? 26 : 24} />
+            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Map</span>
+          </motion.button>
+        </Link>
 
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setActiveTab('admin')}
-          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: activeTab === 'admin' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
-        >
-          <User size={activeTab === 'admin' ? 26 : 24} />
-          <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Admin</span>
-        </motion.button>
+        <Link to="/admin" style={{ textDecoration: 'none' }}>
+          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/admin' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <User size={currentPath === '/admin' ? 26 : 24} />
+            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Admin</span>
+          </motion.button>
+        </Link>
       </nav>
     </>
   );
 };
+
+const App: React.FC = () => (
+  <BrowserRouter>
+    <AppContent />
+  </BrowserRouter>
+);
 
 export default App;
