@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Plus, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
+import { Newspaper, BarChart2, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
@@ -470,16 +470,6 @@ const AppContent: React.FC = () => {
     }));
   };
 
-  const postPoll = (q: string, opts: string[]) => {
-    setPoll({
-      id: Date.now().toString(),
-      question: q,
-      options: opts.map((t, i) => ({ id: `opt-${i}`, text: t, votes: 0 })),
-      active: true,
-      totalVotes: 0
-    });
-  };
-
   return (
     <>
       <header style={{
@@ -565,24 +555,6 @@ const AppContent: React.FC = () => {
                 <Leaderboard />
               </motion.div>
             } />
-
-            <Route path="/admin" element={
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
-              >
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Creator Dashboard</h3>
-                <div className="glass-panel" style={{ padding: '20px' }}>
-                  <p style={{ fontWeight: 600, marginBottom: '16px' }}>Start a New Poll</p>
-                  <input placeholder="Ask something interesting..." type="text" style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'white', marginBottom: '12px' }} />
-                  <button onClick={() => postPoll("Upcoming Night Layout?", ["Neon Heights", "Carbon Valley", "Thunder Road"])} style={{ width: '100%', marginTop: '20px', background: 'var(--accent-primary)', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: 'var(--shadow-neon)' }}>
-                    <Plus size={18} /> CREATE POLL
-                  </button>
-                </div>
-              </motion.div>
-            } />
           </Routes>
         </AnimatePresence>
       </main>
@@ -630,13 +602,6 @@ const AppContent: React.FC = () => {
           <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/leaderboard' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
             <Trophy size={currentPath === '/leaderboard' ? 26 : 22} strokeWidth={currentPath === '/leaderboard' ? 2.5 : 2} />
             <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Ranks</span>
-          </motion.button>
-        </Link>
-
-        <Link to="/admin" style={{ textDecoration: 'none', flex: 1 }}>
-          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/admin' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <User size={currentPath === '/admin' ? 26 : 22} strokeWidth={currentPath === '/admin' ? 2.5 : 2} />
-            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Admin</span>
           </motion.button>
         </Link>
       </nav>
