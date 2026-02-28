@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell } from 'lucide-react';
+import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell, Map as MapIcon, Radio } from 'lucide-react';
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
 
 // --- Types ---
@@ -21,6 +23,29 @@ interface Poll {
   active: boolean;
   totalVotes: number;
 }
+
+const API_KEY = 'AIzaSyBk0-aWAhQLpof4ThjLVj_gUX5Krkwl3ME'; // Replace with your key
+
+const mapStyles = [
+  { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+  { featureType: "administrative.locality", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#263c3f" }] },
+  { featureType: "poi.park", elementType: "labels.text.fill", stylers: [{ color: "#6b9a76" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#38414e" }] },
+  { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#212a37" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9ca5b3" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#746855" }] },
+  { featureType: "road.highway", elementType: "geometry.stroke", stylers: [{ color: "#1f2835" }] },
+  { featureType: "road.highway", elementType: "labels.text.fill", stylers: [{ color: "#f3d19c" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f3948" }] },
+  { featureType: "transit.station", elementType: "labels.text.fill", stylers: [{ color: "#d59563" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#17263c" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#515c6d" }] },
+  { featureType: "water", elementType: "labels.text.stroke", stylers: [{ color: "#17263c" }] },
+];
 
 // --- Components ---
 
@@ -128,10 +153,106 @@ const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }
   );
 };
 
-// --- Main App Component ---
+const Markers = ({ drivers }: { drivers: { id: number, lat: number, lng: number }[] }) => {
+  const map = useMap();
+  const [clusterer, setClusterer] = React.useState<MarkerClusterer | null>(null);
+  const markersRef = React.useRef<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({});
+
+  // Initialize marker clusterer
+  React.useEffect(() => {
+    if (!map) return;
+    if (!clusterer) {
+      setClusterer(new MarkerClusterer({ map }));
+    }
+  }, [map, clusterer]);
+
+  // Update markers
+  const setMarkerRef = (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => {
+    if (marker) {
+      markersRef.current[key] = marker;
+    } else {
+      delete markersRef.current[key];
+    }
+  };
+
+  React.useEffect(() => {
+    if (!clusterer) return;
+    clusterer.clearMarkers();
+    clusterer.addMarkers(Object.values(markersRef.current));
+  }, [clusterer, drivers]);
+
+  return (
+    <>
+      {drivers.map(d => (
+        <AdvancedMarker
+          key={d.id}
+          position={{ lat: d.lat, lng: d.lng }}
+          ref={(marker) => setMarkerRef(marker, d.id.toString())}
+        >
+          <div className="driver-marker" style={{
+            background: d.id % 5 === 0 ? 'var(--accent-secondary)' : 'var(--accent-primary)',
+            boxShadow: d.id % 5 === 0 ? '0 0 15px var(--accent-secondary)' : '0 0 15px var(--accent-primary)',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+          }} />
+        </AdvancedMarker>
+      ))}
+    </>
+  );
+};
+
+const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number }[] }) => {
+  return (
+    <div className="map-container" style={{ height: 'calc(100vh - 240px)', marginTop: '10px', background: '#050505' }}>
+      <APIProvider apiKey={API_KEY}>
+        <Map
+          style={{ width: '100%', height: '100%' }}
+          defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
+          defaultZoom={5}
+          mapId="4c958d13fc86afcf416883a4"
+          gestureHandling={'greedy'}
+          disableDefaultUI={true}
+          styles={mapStyles}
+        >
+          <Markers drivers={drivers} />
+        </Map>
+      </APIProvider>
+
+      {/* Top Overlay */}
+      <div className="map-overlay-top">
+        <div className="stat-badge">
+          <Radio size={16} color="var(--accent-neon)" className="pulse" />
+          <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>10,482 Active GPS Signals</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'feed' | 'polls' | 'admin'>('feed');
+  const [activeTab, setActiveTab] = useState<'feed' | 'polls' | 'map' | 'admin'>('feed');
+  const [drivers, setDrivers] = useState<{ id: number, lat: number, lng: number }[]>([]);
+
+  // Simulate incoming GPS data across India
+  useEffect(() => {
+    const initialDrivers = Array.from({ length: 150 }, (_, i) => ({
+      id: i,
+      lat: 20.5937 + (Math.random() - 0.5) * 15,
+      lng: 78.9629 + (Math.random() - 0.5) * 15
+    }));
+    setDrivers(initialDrivers);
+
+    const interval = setInterval(() => {
+      setDrivers(prev => prev.map(d => ({
+        ...d,
+        lat: d.lat + (Math.random() - 0.5) * 0.1,
+        lng: d.lng + (Math.random() - 0.5) * 0.1
+      })));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   const [feed] = useState<FeedItem[]>([
     {
       id: '1',
@@ -251,6 +372,19 @@ const App: React.FC = () => {
             </motion.div>
           )}
 
+          {activeTab === 'map' && (
+            <motion.div
+              key="map"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Network</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '15px' }}>Tracking active vehicle telemetry across the region.</p>
+              <LiveMap drivers={drivers} />
+            </motion.div>
+          )}
+
           {activeTab === 'admin' && (
             <motion.div
               key="admin"
@@ -346,6 +480,15 @@ const App: React.FC = () => {
         >
           <BarChart2 size={activeTab === 'polls' ? 26 : 24} />
           <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Polls</span>
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setActiveTab('map')}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: activeTab === 'map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
+        >
+          <MapIcon size={activeTab === 'map' ? 26 : 24} />
+          <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Map</span>
         </motion.button>
 
         <motion.button
