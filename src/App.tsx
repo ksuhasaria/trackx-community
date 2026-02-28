@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Newspaper, BarChart2, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
+import { GoogleMapsOverlay } from '@deck.gl/google-maps';
+import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import './index.css';
 
 // --- Types ---
@@ -209,48 +211,46 @@ const Markers = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
 
 const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng: number }[], visible: boolean }) => {
   const map = useMap();
-  const [heatmap, setHeatmap] = React.useState<google.maps.visualization.HeatmapLayer | null>(null);
+  const [overlay, setOverlay] = React.useState<GoogleMapsOverlay | null>(null);
 
   React.useEffect(() => {
-    if (!map || !visible) {
-      if (heatmap) heatmap.setMap(null);
-      return;
-    }
-    if (heatmap) {
-      heatmap.setMap(map);
+    if (!map) return;
+    const newOverlay = new GoogleMapsOverlay({ layers: [] });
+    newOverlay.setMap(map);
+    setOverlay(newOverlay);
+    return () => newOverlay.setMap(null);
+  }, [map]);
+
+  React.useEffect(() => {
+    if (!overlay) return;
+
+    if (!visible) {
+      overlay.setProps({ layers: [] });
       return;
     }
 
-    const layer = new google.maps.visualization.HeatmapLayer({
-      map,
-      radius: 35,
-      opacity: 0.8,
-      gradient: [
-        'rgba(0, 255, 255, 0)',
-        'rgba(0, 255, 255, 1)',
-        'rgba(0, 191, 255, 1)',
-        'rgba(0, 127, 255, 1)',
-        'rgba(0, 63, 255, 1)',
-        'rgba(0, 0, 255, 1)',
-        'rgba(0, 0, 223, 1)',
-        'rgba(0, 0, 191, 1)',
-        'rgba(0, 0, 159, 1)',
-        'rgba(0, 0, 127, 1)',
-        'rgba(63, 0, 91, 1)',
-        'rgba(127, 0, 63, 1)',
-        'rgba(191, 0, 31, 1)',
-        'rgba(255, 0, 0, 1)'
+    const hexagonLayer = new HexagonLayer({
+      id: 'hexagon-layer',
+      data: drivers,
+      getPosition: (d: any) => [d.lng, d.lat],
+      getElevationWeight: () => 1,
+      elevationScale: 5000,
+      extruded: true,
+      radius: 40000, // 40km bins
+      opacity: 0.85,
+      coverage: 0.95,
+      colorRange: [
+        [32, 18, 77],
+        [74, 33, 150],
+        [125, 48, 204],
+        [186, 60, 235],
+        [224, 90, 255],
+        [255, 170, 255]
       ]
     });
-    setHeatmap(layer);
-    return () => layer.setMap(null);
-  }, [map, visible, heatmap]);
 
-  React.useEffect(() => {
-    if (!heatmap || !visible) return;
-    const points = drivers.map(d => new google.maps.LatLng(d.lat, d.lng));
-    heatmap.setData(points);
-  }, [heatmap, drivers, visible]);
+    overlay.setProps({ layers: [hexagonLayer] });
+  }, [overlay, drivers, visible]);
 
   return null;
 };
@@ -389,7 +389,7 @@ const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number 
             transition: 'all 0.3s'
           }}
         >
-          HEATMAP
+          HEXBIN
         </button>
       </div>
 
