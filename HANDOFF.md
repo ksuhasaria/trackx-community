@@ -28,3 +28,10 @@ Building **TrackX Community**, a premium, high-performance social hub for the Tr
 1. **Garage / Profile Page**: Implement the 4th tab to allow users to see their own car specs, history, and achievements.
 2. **Proximity Alerts (Radar)**: Build a system to notify users when high-ranked drivers or friends are nearby on the map.
 3. **Real Data Integration**: Migrate the simulation `useEffect` in `AppContent` to call a real backend API for live telemetry and community posts.
+
+## 🔌 Backend API Integration Plan (Pending)
+- **Current User Profile**: Data model including `userId`, `username`, `rank` (tier, points), and `garage` (vehicle details). Needs auth token via WebView bridge.
+- **Live Network Telemetry**: Endpoint (e.g. `GET /api/v1/community/map-ping`) returning viewport-specific driver locations to keep the map lightweight.
+- **Live Feed & Social Posts**: Infinite scroll paginated endpoint (e.g. `GET /api/v1/community/feed`).
+- **User Actions**: POST endpoints for voting on polls (`/vote`), liking posts (`/like`), and creating new posts.
+- **State & Auth**: Plan to use React Query for caching/refetching and receive secure JWT tokens from the main Android app.

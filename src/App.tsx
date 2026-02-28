@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
+import { Newspaper, BarChart2, Zap, Layers, Map as MapIcon, Radio, Trophy, Timer, Star, CheckCircle } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
+import CreatePost from './CreatePost';
+import DriverProfileModal from './DriverProfileModal';
 
 // --- Types ---
 interface FeedItem {
@@ -78,6 +80,33 @@ const FeedCard = ({ item }: { item: FeedItem }) => (
   </motion.div>
 );
 
+const AnimatedPercentage = ({ value }: { value: number }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    let current = 0;
+    const end = value;
+    if (end === 0) return;
+
+    const duration = 1000;
+    const increment = end / (duration / 16);
+
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= end) {
+        clearInterval(timer);
+        setDisplayValue(end);
+      } else {
+        setDisplayValue(Math.floor(current));
+      }
+    }, 16);
+
+    return () => clearInterval(timer);
+  }, [value]);
+
+  return <span>{displayValue}%</span>;
+};
+
 const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }) => {
   const [votedId, setVotedId] = useState<string | null>(null);
 
@@ -127,8 +156,19 @@ const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }
                   transition: 'all 0.3s ease'
                 }}
               >
-                <span>{opt.text}</span>
-                {votedId && <span style={{ fontWeight: 700, color: 'var(--accent-primary)' }}>{percentage}%</span>}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {votedId === opt.id && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
+                      <CheckCircle size={18} color="var(--accent-primary)" />
+                    </motion.div>
+                  )}
+                  {opt.text}
+                </span>
+                {votedId && (
+                  <span style={{ fontWeight: 800, color: votedId === opt.id ? 'var(--accent-primary)' : 'white' }}>
+                    <AnimatedPercentage value={percentage} />
+                  </span>
+                )}
               </button>
               {votedId && (
                 <motion.div
@@ -210,6 +250,7 @@ const Markers = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
 
 
 const Leaderboard = () => {
+  const [selectedDriver, setSelectedDriver] = useState<any>(null);
   const [ranks] = useState([
     { id: 1, name: 'CyberPhantom', score: 12450, time: '142h', status: 'Expert', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop' },
     { id: 2, name: 'NitroWave', score: 11200, time: '128h', status: 'Pro', avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop' },
@@ -232,12 +273,15 @@ const Leaderboard = () => {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.1 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setSelectedDriver(runner)}
             className="glass-panel"
             style={{
               padding: '16px 20px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              cursor: 'pointer',
               borderLeft: index < 3 ? `4px solid ${index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : '#b45309'}` : '1px solid var(--glass-border)'
             }}
           >
@@ -275,6 +319,8 @@ const Leaderboard = () => {
           </p>
         </div>
       </div>
+
+      <DriverProfileModal driver={selectedDriver} onClose={() => setSelectedDriver(null)} />
     </div>
   );
 };
@@ -417,43 +463,109 @@ const AppContent: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const [feed] = useState<FeedItem[]>([
+  const [feed, setFeed] = useState<FeedItem[]>([
     {
       id: '1',
-      user: 'TurboRacer',
-      avatar: '/avatar_racer.png',
-      content: 'Just arrived at the TrackX night meetup! The vibe is electric tonight. Fast cars and neon lights. 🏎️💨',
-      time: '2m ago',
-      image: '/track_night.png',
-      likes: 142
+      user: 'RahulG_77',
+      avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop',
+      content: 'Just crossed the new Mumbai-Pune Expressway section. The road is buttery smooth but watch out for speed interceptors near the Lonavala exit! 🚓',
+      time: '12m ago',
+      likes: 342
     },
     {
       id: '2',
-      user: 'TrackAdmin',
+      user: 'KeralaRider',
+      avatar: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=100&h=100&fit=crop',
+      content: 'Monsoon has officially hit the western ghats. Visibility is dropping fast near Munnar. Drive safe everyone, use those fog lamps! 🌧️�️',
+      time: '45m ago',
+      image: 'https://images.unsplash.com/photo-1518081461904-9d8f13734f1a?w=600&h=400&fit=crop',
+      likes: 890
+    },
+    {
+      id: '3',
+      user: 'LogisticsKing',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+      content: 'Stuck at the Hosur border crossing for the last 2 hours. Commercial tax checking is heavy today. Any other truckers passing through here?',
+      time: '1h ago',
+      likes: 124
+    },
+    {
+      id: '4',
+      user: 'Priya_Drives',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+      content: 'Just got the 10,000km service done on the Creta. Cost me ₹6,500 at the official service center. Does that sound right or did I get overcharged?',
+      time: '3h ago',
+      likes: 56
+    },
+    {
+      id: '5',
+      user: 'TrackX_Official',
       avatar: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop',
-      content: 'Dont forget to check the new poll! We want to know which track layout you prefer for next week.',
-      time: '15m ago',
-      likes: 89
+      content: '🚨 Traffic Alert: Major waterlogging reported on ORR Bellandur (Bangalore). Avoid the route if possible. We are seeing average speeds drop below 5km/h on the live map.',
+      time: '4h ago',
+      likes: 1205
     }
   ]);
 
-  const [poll, setPoll] = useState<Poll>({
-    id: 'poll-1',
-    question: "Which night track layout is the best for drifting? 🏎️🔥",
-    options: [
-      { id: 'opt-1', text: "The Neon Loop", votes: 45 },
-      { id: 'opt-2', text: "Azure Straightaway", votes: 32 },
-      { id: 'opt-3', text: "Voltage S-Curve", votes: 68 }
-    ],
-    active: true,
-    totalVotes: 145
-  });
+  const [polls, setPolls] = useState<Poll[]>([
+    {
+      id: 'poll-1',
+      question: "What's your preferred fuel type for your next vehicle? ⛽",
+      options: [
+        { id: '1-opt-1', text: "Petrol", votes: 450 },
+        { id: '1-opt-2', text: "Diesel", votes: 210 },
+        { id: '1-opt-3', text: "EV (Electric)", votes: 320 },
+        { id: '1-opt-4', text: "CNG/Hybrid", votes: 145 }
+      ],
+      active: true,
+      totalVotes: 1125
+    },
+    {
+      id: 'poll-2',
+      question: "Which feature is an absolute MUST-HAVE in Indian traffic? �",
+      options: [
+        { id: '2-opt-1', text: "Automatic Transmission", votes: 890 },
+        { id: '2-opt-2', text: "360-degree Camera", votes: 420 },
+        { id: '2-opt-3', text: "Ventilated Seats", votes: 615 }
+      ],
+      active: true,
+      totalVotes: 1925
+    },
+    {
+      id: 'poll-3',
+      question: "Who's your preferred insurance provider for hassle-free claims? 🛡️",
+      options: [
+        { id: '3-opt-1', text: "HDFC Ergo", votes: 312 },
+        { id: '3-opt-2', text: "ICICI Lombard", votes: 280 },
+        { id: '3-opt-3', text: "Acko", votes: 450 },
+        { id: '3-opt-4', text: "Digit", votes: 201 }
+      ],
+      active: true,
+      totalVotes: 1243
+    }
+  ]);
 
-  const handleVote = (optId: string) => {
-    setPoll(prev => ({
-      ...prev,
-      totalVotes: prev.totalVotes + 1,
-      options: prev.options.map(o => o.id === optId ? { ...o, votes: o.votes + 1 } : o)
+  const handlePost = (content: string, image?: string) => {
+    const newPost: FeedItem = {
+      id: Date.now().toString(),
+      user: 'You',
+      avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop',
+      content,
+      image,
+      time: 'Just now',
+      likes: 0
+    };
+    setFeed(prev => [newPost, ...prev]);
+  };
+
+  const handleVote = (pollId: string, optId: string) => {
+    setPolls(prev => prev.map(p => {
+      if (p.id !== pollId) return p;
+      return {
+        ...p,
+        totalVotes: p.totalVotes + 1,
+        options: p.options.map(o => o.id === optId ? { ...o, votes: o.votes + 1 } : o)
+      };
     }));
   };
 
@@ -473,11 +585,7 @@ const AppContent: React.FC = () => {
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
             TRACK<span style={{ color: 'var(--accent-primary)' }}>X</span>
           </h1>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Drivers Network</p>
-        </div>
-        <div style={{ position: 'relative' }}>
-          <Bell size={24} color="var(--text-secondary)" />
-          <div style={{ position: 'absolute', top: -2, right: -2, width: 8, height: 8, background: '#ef4444', borderRadius: '50%' }} />
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Vehicle Owners</p>
         </div>
       </header>
 
@@ -498,6 +606,7 @@ const AppContent: React.FC = () => {
                   </div>
                 </div>
                 {feed.map(item => <FeedCard key={item.id} item={item} />)}
+                <CreatePost onPost={handlePost} />
               </motion.div>
             } />
 
@@ -509,7 +618,9 @@ const AppContent: React.FC = () => {
                 transition={{ duration: 0.3 }}
               >
                 <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '20px' }}>Active Polls</h3>
-                <PollView poll={poll} onVote={handleVote} />
+                {polls.map(poll => (
+                  <PollView key={poll.id} poll={poll} onVote={(optId) => handleVote(poll.id, optId)} />
+                ))}
                 <div style={{ marginTop: '24px', padding: '20px' }} className="glass-panel">
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
