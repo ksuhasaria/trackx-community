@@ -22,7 +22,23 @@ Building **TrackX Community**, a premium, high-performance social hub for the Tr
 - `vercel.json`: Configured for Single Page Application (SPA) routing to prevent 404s on refresh.
 - `package.json`: Managed dependencies including `framer-motion`, `lucide-react`, and Google Maps libraries.
 
-## 💡 Important Context & Decisions
+## � Tech Stack (Frontend)
+- **Framework**: React 19 + TypeScript.
+- **Build Tool**: Vite.
+- **Styling**: Vanilla CSS (using CSS variables for themes) with a focus on Glassmorphism and Neon utility classes.
+- **Animations**: Framer Motion for page transitions, modals, and micro-interactions.
+- **Icons**: Lucide React.
+- **Maps**: Google Maps API via `@vis.gl/react-google-maps` with `@googlemaps/markerclusterer`.
+- **Routing**: React Router DOM v7 (SPA).
+
+## 🗄️ Planned Backend & Database Architecture
+*Current state: All data (feeds, 1,200 simulated drivers) runs in-memory via React `useState` and resets on refresh.*
+- **Telemetry & Live Map (High Volume)**: **Redis** or **Memcached** for fast read/write of live GPS pings, handled via **Apache Kafka** streams.
+- **Social Feed, Ads & Profiles**: **PostgreSQL** for relational data (users, garage specs, relationships) or **MongoDB** for unstructured feed payloads (like SVG system cards).
+- **System Insights Analytics**: **ClickHouse** or **TimescaleDB** to quickly generate "Midnight Run" or "Road Warrior" cards from millions of historical GPS breadcrumbs.
+- **Core API**: Node.js (Express or NestJS) serving REST/GraphQL endpoints, utilizing **React Query** on the frontend for caching/refetching.
+
+## �💡 Important Context & Decisions
 - **Mobile Only**: UI is constrained to a `max-width: 500px`. Do not add desktop sidebars or multi-column layouts.
 - **Security**: The "Admin" tab was intentionally removed. All administrative controls (creating polls, etc.) must be moved to a separate backend dashboard.
 - **Map Interaction**: The map uses `gestureHandling: 'greedy'` for better control inside mobile scroll containers.
