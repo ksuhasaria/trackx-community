@@ -6,12 +6,16 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
 import CreatePost from './CreatePost';
 import DriverProfileModal from './DriverProfileModal';
+import { SystemFeedCard } from './SystemFeedCard';
 
 // --- Types ---
-interface FeedItem {
+export interface FeedItem {
   id: string;
-  user: string;
-  avatar: string;
+  type?: 'user' | 'system';
+  systemType?: 'midnight_run' | 'road_warrior' | 'smooth_operator' | 'canyon_carver' | 'city_pulse';
+  systemData?: any;
+  user?: string;
+  avatar?: string;
   content: string;
   time: string;
   image?: string;
@@ -465,6 +469,14 @@ const AppContent: React.FC = () => {
 
   const [feed, setFeed] = useState<FeedItem[]>([
     {
+      id: 'sys-1',
+      type: 'system',
+      systemType: 'midnight_run',
+      content: 'Someone just completed a 45km Midnight Run across the city. The roads belong to the night riders.',
+      time: '10m ago',
+      likes: 104
+    },
+    {
       id: '1',
       user: 'RahulG_77',
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop',
@@ -473,13 +485,29 @@ const AppContent: React.FC = () => {
       likes: 342
     },
     {
+      id: 'sys-2',
+      type: 'system',
+      systemType: 'road_warrior',
+      content: 'Epic journey logged! A driver just clocked 350km in a single sitting. True Road Warrior.',
+      time: '34m ago',
+      likes: 541
+    },
+    {
       id: '2',
       user: 'KeralaRider',
       avatar: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=100&h=100&fit=crop',
-      content: 'Monsoon has officially hit the western ghats. Visibility is dropping fast near Munnar. Drive safe everyone, use those fog lamps! 🌧️�️',
+      content: 'Monsoon has officially hit the western ghats. Visibility is dropping fast near Munnar. Drive safe everyone, use those fog lamps! 🌧️🏔️',
       time: '45m ago',
       image: 'https://images.unsplash.com/photo-1518081461904-9d8f13734f1a?w=600&h=400&fit=crop',
       likes: 890
+    },
+    {
+      id: 'sys-3',
+      type: 'system',
+      systemType: 'smooth_operator',
+      content: 'Flawless driving detected! 62km driven with a 100% safety rating. Smooth Operator.',
+      time: '2h ago',
+      likes: 89
     },
     {
       id: '3',
@@ -490,12 +518,28 @@ const AppContent: React.FC = () => {
       likes: 124
     },
     {
+      id: 'sys-4',
+      type: 'system',
+      systemType: 'canyon_carver',
+      content: 'Hitting the apexes! A driver just navigated 24 hairpins on this Canyon Carver route.',
+      time: '3h ago',
+      likes: 211
+    },
+    {
       id: '4',
       user: 'Priya_Drives',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
       content: 'Just got the 10,000km service done on the Creta. Cost me ₹6,500 at the official service center. Does that sound right or did I get overcharged?',
       time: '3h ago',
       likes: 56
+    },
+    {
+      id: 'sys-5',
+      type: 'system',
+      systemType: 'city_pulse',
+      content: 'Today\'s TrackX Pulse: Peak traffic avoided by 60% of tracked users.',
+      time: '5h ago',
+      likes: 1205
     },
     {
       id: '5',
@@ -605,7 +649,7 @@ const AppContent: React.FC = () => {
                     <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
                   </div>
                 </div>
-                {feed.map(item => <FeedCard key={item.id} item={item} />)}
+                {feed.map(item => item.type === 'system' ? <SystemFeedCard key={item.id} item={item} /> : <FeedCard key={item.id} item={item} />)}
                 <CreatePost onPost={handlePost} />
               </motion.div>
             } />
@@ -655,7 +699,7 @@ const AppContent: React.FC = () => {
             } />
           </Routes>
         </AnimatePresence>
-      </main>
+      </main >
 
       <nav style={{
         position: 'fixed',
