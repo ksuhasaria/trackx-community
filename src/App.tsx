@@ -473,7 +473,7 @@ const AppContent: React.FC = () => {
           <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
             TRACK<span style={{ color: 'var(--accent-primary)' }}>X</span>
           </h1>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Community Hub</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Drivers Network</p>
         </div>
         <div style={{ position: 'relative' }}>
           <Bell size={24} color="var(--text-secondary)" />
