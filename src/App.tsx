@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Plus, Zap, Layers, Bell, Map as MapIcon, Radio } from 'lucide-react';
+import { Newspaper, BarChart2, User, Plus, Zap, Layers, Bell, Map as MapIcon, Radio, Trophy, Timer, Star } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
@@ -255,6 +255,76 @@ const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng
   return null;
 };
 
+const Leaderboard = () => {
+  const [ranks] = useState([
+    { id: 1, name: 'CyberPhantom', score: 12450, time: '142h', status: 'Expert', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop' },
+    { id: 2, name: 'NitroWave', score: 11200, time: '128h', status: 'Pro', avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=100&h=100&fit=crop' },
+    { id: 3, name: 'TurboRacer', score: 9800, time: '115h', status: 'Pro', avatar: '/avatar_racer.png' },
+    { id: 4, name: 'AzureFlash', score: 8500, time: '98h', status: 'Racer', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop' },
+    { id: 5, name: 'NeonDrift', score: 7200, time: '82h', status: 'Racer', avatar: 'https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=100&h=100&fit=crop' },
+  ]);
+
+  return (
+    <div className="leaderboard-container">
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+        <Trophy color="var(--accent-primary)" size={28} />
+        <h3 style={{ fontSize: '1.5rem', fontWeight: 800 }}>Season 1 Hall of Fame</h3>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {ranks.map((runner, index) => (
+          <motion.div
+            key={runner.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="glass-panel"
+            style={{
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              borderLeft: index < 3 ? `4px solid ${index === 0 ? '#fbbf24' : index === 1 ? '#94a3b8' : '#b45309'}` : '1px solid var(--glass-border)'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 800, width: '24px', color: index < 3 ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+                #{index + 1}
+              </span>
+              <img src={runner.avatar} alt={runner.name} style={{ width: '48px', height: '48px', borderRadius: '12px', objectFit: 'cover' }} />
+              <div>
+                <h4 style={{ fontWeight: 700, fontSize: '1.1rem' }}>{runner.name}</h4>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+                  <span className="live-badge" style={{ fontSize: '0.65rem', padding: '2px 8px' }}>{runner.status}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    <Timer size={12} /> {runner.time}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--accent-primary)' }}>
+                {runner.score.toLocaleString()}
+              </div>
+              <div style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--text-secondary)', letterSpacing: '1px' }}>POINTS</div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      <div className="glass-panel" style={{ marginTop: '24px', padding: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Star color="#fbbf24" size={20} fill="#fbbf24" />
+          <p style={{ fontSize: '0.9rem', fontWeight: 500 }}>
+            You are currently ranked <span style={{ color: 'var(--accent-primary)', fontWeight: 800 }}>#1,402</span> out of 10,482 drivers.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number }[] }) => {
   const [viewMode, setViewMode] = useState<'cluster' | 'heatmap'>('cluster');
 
@@ -485,6 +555,17 @@ const AppContent: React.FC = () => {
               </motion.div>
             } />
 
+            <Route path="/leaderboard" element={
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Leaderboard />
+              </motion.div>
+            } />
+
             <Route path="/admin" element={
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -539,6 +620,13 @@ const AppContent: React.FC = () => {
           <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
             <MapIcon size={currentPath === '/map' ? 26 : 24} />
             <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Map</span>
+          </motion.button>
+        </Link>
+
+        <Link to="/leaderboard" style={{ textDecoration: 'none' }}>
+          <motion.button whileTap={{ scale: 0.9 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/leaderboard' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            <Trophy size={currentPath === '/leaderboard' ? 26 : 24} />
+            <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>Ranks</span>
           </motion.button>
         </Link>
 
