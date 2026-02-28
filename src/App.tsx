@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell, Map as MapIcon, Radio } from 'lucide-react';
+import { Newspaper, BarChart2, User, Plus, Info, Zap, Layers, Bell, Map as MapIcon, Radio, Navigation } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
@@ -153,33 +153,35 @@ const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }
   );
 };
 
-const Markers = ({ drivers }: { drivers: { id: number, lat: number, lng: number }[] }) => {
+const Markers = ({ drivers, visible }: { drivers: { id: number, lat: number, lng: number }[], visible: boolean }) => {
   const map = useMap();
   const [clusterer, setClusterer] = React.useState<MarkerClusterer | null>(null);
   const markersRef = React.useRef<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({});
 
   // Initialize marker clusterer
   React.useEffect(() => {
-    if (!map) return;
-    if (!clusterer) {
-      setClusterer(new MarkerClusterer({ map }));
-    }
-  }, [map, clusterer]);
+    if (!map || !visible) return;
+    const newClusterer = new MarkerClusterer({ map });
+    setClusterer(newClusterer);
 
-  // Update markers
-  const setMarkerRef = (marker: google.maps.marker.AdvancedMarkerElement | null, key: string) => {
-    if (marker) {
-      markersRef.current[key] = marker;
-    } else {
-      delete markersRef.current[key];
-    }
-  };
+    return () => {
+      newClusterer.clearMarkers();
+      newClusterer.setMap(null);
+    };
+  }, [map, visible]);
 
+  // Update clusters
   React.useEffect(() => {
-    if (!clusterer) return;
+    if (!clusterer || !visible) {
+      if (clusterer) clusterer.clearMarkers();
+      return;
+    }
     clusterer.clearMarkers();
-    clusterer.addMarkers(Object.values(markersRef.current));
-  }, [clusterer, drivers]);
+    const markers = Object.values(markersRef.current).filter(Boolean);
+    clusterer.addMarkers(markers);
+  }, [clusterer, drivers, visible]);
+
+  if (!visible) return null;
 
   return (
     <>
@@ -187,7 +189,10 @@ const Markers = ({ drivers }: { drivers: { id: number, lat: number, lng: number 
         <AdvancedMarker
           key={d.id}
           position={{ lat: d.lat, lng: d.lng }}
-          ref={(marker) => setMarkerRef(marker, d.id.toString())}
+          ref={(marker) => {
+            if (marker) markersRef.current[d.id] = marker;
+            else delete markersRef.current[d.id];
+          }}
         >
           <div className="driver-marker" style={{
             background: d.id % 5 === 0 ? 'var(--accent-secondary)' : 'var(--accent-primary)',
@@ -202,10 +207,60 @@ const Markers = ({ drivers }: { drivers: { id: number, lat: number, lng: number 
   );
 };
 
+const Heatmap = ({ drivers, visible }: { drivers: { id: number, lat: number, lng: number }[], visible: boolean }) => {
+  const map = useMap();
+  const [heatmap, setHeatmap] = React.useState<google.maps.visualization.HeatmapLayer | null>(null);
+
+  React.useEffect(() => {
+    if (!map || !visible) {
+      if (heatmap) heatmap.setMap(null);
+      return;
+    }
+    if (heatmap) {
+      heatmap.setMap(map);
+      return;
+    }
+
+    const layer = new google.maps.visualization.HeatmapLayer({
+      map,
+      radius: 35,
+      opacity: 0.8,
+      gradient: [
+        'rgba(0, 255, 255, 0)',
+        'rgba(0, 255, 255, 1)',
+        'rgba(0, 191, 255, 1)',
+        'rgba(0, 127, 255, 1)',
+        'rgba(0, 63, 255, 1)',
+        'rgba(0, 0, 255, 1)',
+        'rgba(0, 0, 223, 1)',
+        'rgba(0, 0, 191, 1)',
+        'rgba(0, 0, 159, 1)',
+        'rgba(0, 0, 127, 1)',
+        'rgba(63, 0, 91, 1)',
+        'rgba(127, 0, 63, 1)',
+        'rgba(191, 0, 31, 1)',
+        'rgba(255, 0, 0, 1)'
+      ]
+    });
+    setHeatmap(layer);
+    return () => layer.setMap(null);
+  }, [map, visible, heatmap]);
+
+  React.useEffect(() => {
+    if (!heatmap || !visible) return;
+    const points = drivers.map(d => new google.maps.LatLng(d.lat, d.lng));
+    heatmap.setData(points);
+  }, [heatmap, drivers, visible]);
+
+  return null;
+};
+
 const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number }[] }) => {
+  const [viewMode, setViewMode] = useState<'cluster' | 'heatmap'>('cluster');
+
   return (
     <div className="map-container" style={{ height: 'calc(100vh - 240px)', marginTop: '10px', background: '#050505' }}>
-      <APIProvider apiKey={API_KEY}>
+      <APIProvider apiKey={API_KEY} libraries={['visualization']}>
         <Map
           style={{ width: '100%', height: '100%' }}
           defaultCenter={{ lat: 20.5937, lng: 78.9629 }}
@@ -215,9 +270,58 @@ const LiveMap = ({ drivers }: { drivers: { id: number, lat: number; lng: number 
           disableDefaultUI={true}
           styles={mapStyles}
         >
-          <Markers drivers={drivers} />
+          <Markers drivers={drivers} visible={viewMode === 'cluster'} />
+          <Heatmap drivers={drivers} visible={viewMode === 'heatmap'} />
         </Map>
       </APIProvider>
+
+      {/* View Toggle */}
+      <div style={{
+        position: 'absolute',
+        bottom: '80px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        display: 'flex',
+        background: 'rgba(0,0,0,0.6)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '100px',
+        padding: '4px',
+        border: '1px solid var(--glass-border)',
+        zIndex: 10
+      }}>
+        <button
+          onClick={() => setViewMode('cluster')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '100px',
+            border: 'none',
+            background: viewMode === 'cluster' ? 'var(--accent-primary)' : 'transparent',
+            color: 'white',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.3s'
+          }}
+        >
+          CLUSTERS
+        </button>
+        <button
+          onClick={() => setViewMode('heatmap')}
+          style={{
+            padding: '8px 16px',
+            borderRadius: '100px',
+            border: 'none',
+            background: viewMode === 'heatmap' ? 'var(--accent-primary)' : 'transparent',
+            color: 'white',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.3s'
+          }}
+        >
+          HEATMAP
+        </button>
+      </div>
 
       {/* Top Overlay */}
       <div className="map-overlay-top">
@@ -236,10 +340,10 @@ const App: React.FC = () => {
 
   // Simulate incoming GPS data across India
   useEffect(() => {
-    const initialDrivers = Array.from({ length: 150 }, (_, i) => ({
+    const initialDrivers = Array.from({ length: 300 }, (_, i) => ({
       id: i,
-      lat: 20.5937 + (Math.random() - 0.5) * 15,
-      lng: 78.9629 + (Math.random() - 0.5) * 15
+      lat: 20.5937 + (Math.random() - 0.5) * 18,
+      lng: 78.9629 + (Math.random() - 0.5) * 18
     }));
     setDrivers(initialDrivers);
 
