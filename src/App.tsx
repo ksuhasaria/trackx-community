@@ -11,7 +11,7 @@ import { SystemFeedCard } from './SystemFeedCard';
 // --- Types ---
 export interface FeedItem {
   id: string;
-  type?: 'user' | 'system';
+  type?: 'user' | 'system' | 'poll';
   systemType?: 'midnight_run' | 'road_warrior' | 'smooth_operator' | 'canyon_carver' | 'city_pulse';
   systemData?: any;
   user?: string;
@@ -25,6 +25,7 @@ export interface FeedItem {
     alert: number;
   };
   userReactionType?: 'like' | 'respect' | 'alert';
+  pollData?: Poll;
 }
 
 interface Poll {
@@ -546,58 +547,57 @@ const AppContent: React.FC = () => {
       reactions: { like: 56, respect: 0, alert: 12 }
     },
     {
+      id: 'poll-1',
+      type: 'poll',
+      pollData: {
+        id: 'poll-1',
+        question: "What's your preferred fuel type for your next vehicle? ⛽",
+        options: [
+          { id: '1-opt-1', text: "Petrol", votes: 450 },
+          { id: '1-opt-2', text: "Diesel", votes: 210 },
+          { id: '1-opt-3', text: "EV (Electric)", votes: 320 },
+          { id: '1-opt-4', text: "CNG/Hybrid", votes: 145 }
+        ],
+        active: true,
+        totalVotes: 1125
+      },
+      content: '', // not used
+      time: '6h ago',
+      reactions: { like: 0, respect: 0, alert: 0 }
+    },
+    {
       id: 'sys-5',
       type: 'system',
       systemType: 'city_pulse',
       content: 'Today\'s TrackX Pulse: Peak traffic avoided by 60% of tracked users.',
-      time: '5h ago',
+      time: '6.5h ago',
       reactions: { like: 1205, respect: 104, alert: 0 }
+    },
+    {
+      id: 'poll-2',
+      type: 'poll',
+      pollData: {
+        id: 'poll-2',
+        question: "Which feature is an absolute MUST-HAVE in Indian traffic? ",
+        options: [
+          { id: '2-opt-1', text: "Automatic Transmission", votes: 890 },
+          { id: '2-opt-2', text: "360-degree Camera", votes: 420 },
+          { id: '2-opt-3', text: "Ventilated Seats", votes: 615 }
+        ],
+        active: true,
+        totalVotes: 1925
+      },
+      content: '',
+      time: '7h ago',
+      reactions: { like: 0, respect: 0, alert: 0 }
     },
     {
       id: '5',
       user: 'TrackX_Official',
       avatar: 'https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?w=100&h=100&fit=crop',
       content: '🚨 Traffic Alert: Major waterlogging reported on ORR Bellandur (Bangalore). Avoid the route if possible. We are seeing average speeds drop below 5km/h on the live map.',
-      time: '4h ago',
+      time: '8h ago',
       reactions: { like: 200, respect: 0, alert: 1205 }
-    }
-  ]);
-
-  const [polls, setPolls] = useState<Poll[]>([
-    {
-      id: 'poll-1',
-      question: "What's your preferred fuel type for your next vehicle? ⛽",
-      options: [
-        { id: '1-opt-1', text: "Petrol", votes: 450 },
-        { id: '1-opt-2', text: "Diesel", votes: 210 },
-        { id: '1-opt-3', text: "EV (Electric)", votes: 320 },
-        { id: '1-opt-4', text: "CNG/Hybrid", votes: 145 }
-      ],
-      active: true,
-      totalVotes: 1125
-    },
-    {
-      id: 'poll-2',
-      question: "Which feature is an absolute MUST-HAVE in Indian traffic? �",
-      options: [
-        { id: '2-opt-1', text: "Automatic Transmission", votes: 890 },
-        { id: '2-opt-2', text: "360-degree Camera", votes: 420 },
-        { id: '2-opt-3', text: "Ventilated Seats", votes: 615 }
-      ],
-      active: true,
-      totalVotes: 1925
-    },
-    {
-      id: 'poll-3',
-      question: "Who's your preferred insurance provider for hassle-free claims? 🛡️",
-      options: [
-        { id: '3-opt-1', text: "HDFC Ergo", votes: 312 },
-        { id: '3-opt-2', text: "ICICI Lombard", votes: 280 },
-        { id: '3-opt-3', text: "Acko", votes: 450 },
-        { id: '3-opt-4', text: "Digit", votes: 201 }
-      ],
-      active: true,
-      totalVotes: 1243
     }
   ]);
 
@@ -615,12 +615,15 @@ const AppContent: React.FC = () => {
   };
 
   const handleVote = (pollId: string, optId: string) => {
-    setPolls(prev => prev.map(p => {
-      if (p.id !== pollId) return p;
+    setFeed(prev => prev.map(item => {
+      if (item.type !== 'poll' || item.pollData?.id !== pollId || !item.pollData) return item;
       return {
-        ...p,
-        totalVotes: p.totalVotes + 1,
-        options: p.options.map(o => o.id === optId ? { ...o, votes: o.votes + 1 } : o)
+        ...item,
+        pollData: {
+          ...item.pollData,
+          totalVotes: item.pollData.totalVotes + 1,
+          options: item.pollData.options.map(o => o.id === optId ? { ...o, votes: o.votes + 1 } : o)
+        }
       };
     }));
   };
@@ -654,20 +657,43 @@ const AppContent: React.FC = () => {
   return (
     <>
       <header style={{
-        padding: '24px 20px',
+        padding: '24px 20px 12px 20px',
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column',
         background: 'var(--bg-dark)',
         position: 'sticky',
         top: 0,
         zIndex: 100
       }}>
-        <div>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
-            TRACK<span style={{ color: 'var(--accent-primary)' }}>X</span>
-          </h1>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Vehicle Owners</p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div>
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              TRACK<span style={{ color: 'var(--accent-primary)' }}>X</span>
+            </h1>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 500 }}>Vehicle Owners</p>
+          </div>
+        </div>
+
+        {/* Top Tab Navigation */}
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <div style={{ background: currentPath === '/' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/' ? 'white' : 'var(--text-secondary)' }}>
+              <Newspaper size={16} color={currentPath === '/' ? "var(--accent-primary)" : "currentColor"} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Feed</span>
+            </div>
+          </Link>
+          <Link to="/map" style={{ textDecoration: 'none' }}>
+            <div style={{ background: currentPath === '/map' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/map' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/map' ? 'white' : 'var(--text-secondary)' }}>
+              <MapIcon size={16} color={currentPath === '/map' ? "var(--accent-primary)" : "currentColor"} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Map</span>
+            </div>
+          </Link>
+          <Link to="/leaderboard" style={{ textDecoration: 'none' }}>
+            <div style={{ background: currentPath === '/leaderboard' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/leaderboard' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/leaderboard' ? 'white' : 'var(--text-secondary)' }}>
+              <Trophy size={16} color={currentPath === '/leaderboard' ? "var(--accent-primary)" : "currentColor"} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Ranks</span>
+            </div>
+          </Link>
         </div>
       </header>
 
@@ -687,29 +713,12 @@ const AppContent: React.FC = () => {
                     <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
                   </div>
                 </div>
-                {feed.map(item => item.type === 'system' ? <SystemFeedCard key={item.id} item={item} onReact={handleReaction} /> : <FeedCard key={item.id} item={item} onReact={handleReaction} />)}
+                {feed.map(item => {
+                  if (item.type === 'system') return <SystemFeedCard key={item.id} item={item} onReact={handleReaction} />;
+                  if (item.type === 'poll' && item.pollData) return <PollView key={item.id} poll={item.pollData} onVote={(optId) => handleVote(item.pollData!.id, optId)} />;
+                  return <FeedCard key={item.id} item={item} onReact={handleReaction} />;
+                })}
                 <CreatePost onPost={handlePost} />
-              </motion.div>
-            } />
-
-            <Route path="/polls" element={
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '20px' }}>Active Polls</h3>
-                {polls.map(poll => (
-                  <PollView key={poll.id} poll={poll} onVote={(optId) => handleVote(poll.id, optId)} />
-                ))}
-                <div style={{ marginTop: '24px', padding: '20px' }} className="glass-panel">
-                  <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                      Results are calculated in real-time. Polls expire every 24 hours to keep the competition fresh!
-                    </p>
-                  </div>
-                </div>
               </motion.div>
             } />
 
@@ -737,54 +746,7 @@ const AppContent: React.FC = () => {
             } />
           </Routes>
         </AnimatePresence>
-      </main >
-
-      <nav style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: "10px 10px calc(14px + var(--safe-area-bottom))",
-        background: 'rgba(5, 5, 5, 0.9)',
-        backdropFilter: 'blur(25px)',
-        WebkitBackdropFilter: 'blur(25px)',
-        borderTop: '1px solid var(--glass-border)',
-        display: 'flex',
-        justifyContent: 'space-around',
-        alignItems: 'center',
-        zIndex: 1000
-      }}>
-        <Link to="/" style={{ textDecoration: 'none', flex: 1 }}>
-          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <Newspaper size={currentPath === '/' ? 26 : 22} strokeWidth={currentPath === '/' ? 2.5 : 2} />
-            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Feed</span>
-          </motion.button>
-        </Link>
-
-        <Link to="/polls" style={{ textDecoration: 'none', flex: 1 }}>
-          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/polls' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <BarChart2 size={currentPath === '/polls' ? 26 : 22} strokeWidth={currentPath === '/polls' ? 2.5 : 2} />
-            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Polls</span>
-          </motion.button>
-        </Link>
-
-        <Link to="/map" style={{ textDecoration: 'none', flex: 1 }}>
-          <motion.button
-            whileTap={{ scale: 0.85 }}
-            style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/map' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}
-          >
-            <MapIcon size={currentPath === '/map' ? 26 : 22} strokeWidth={currentPath === '/map' ? 2.5 : 2} />
-            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Map</span>
-          </motion.button>
-        </Link>
-
-        <Link to="/leaderboard" style={{ textDecoration: 'none', flex: 1 }}>
-          <motion.button whileTap={{ scale: 0.85 }} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'none', border: 'none', color: currentPath === '/leaderboard' ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
-            <Trophy size={currentPath === '/leaderboard' ? 26 : 22} strokeWidth={currentPath === '/leaderboard' ? 2.5 : 2} />
-            <span style={{ fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Ranks</span>
-          </motion.button>
-        </Link>
-      </nav>
+      </main>
     </>
   );
 };
