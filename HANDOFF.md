@@ -46,8 +46,7 @@ Building **TrackX Community**, a premium, high-performance social hub for the Tr
 - **Hexbin Experiment**: We tested a Deck.gl Hexbin visualization but decided to remove it to keep the UI clean and performant; sticking to pure **Marker Clusters** for now.
 
 ## 🚀 Immediate Next Steps
-1. **Proximity Alerts (Radar)**: Build a system to notify users when high-ranked drivers or friends are nearby on the map.
-2. **Real Data Integration**: Migrate the simulation `useEffect` in `AppContent` to call a real backend API for live telemetry and community posts.
+1. **Real Data Integration**: Migrate the simulation `useEffect` in `AppContent` to call a real backend API for live telemetry and community posts.
 
 ## 🔌 Backend API Integration Plan (Pending)
 - **Current User Profile**: Data model including `userId`, `username`, `rank` (tier, points), and `garage` (vehicle details). Needs auth token via WebView bridge.
