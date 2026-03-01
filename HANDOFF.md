@@ -10,7 +10,8 @@ Building **TrackX Community**, a premium, high-performance social hub for the Tr
 - **Enhanced Feed & Polls**: Updated dummy data to resonate with everyday Indian vehicle owners. Replaced static likes with an interactive, anonymous 3-icon reaction system (ThumbsUp, Flame, Megaphone).
 - **Automated System Cards**: Engineered 5 distinct, privacy-preserving SVG visual cards (Midnight Run, Canyon Carver, Road Warrior, Smooth Operator, City Pulse) that automatically inject into the feed based on anonymized telematics data.
 - **Interactive Posts**: Developed a standalone `CreatePost` UI featuring a full-screen glassmorphic modal for drafting messages and adding images.
-- **Mobile-First UI**: Optimized every component for a 100% mobile WebView experience, including fixed bottom navigation, glassmorphism, and safe-area padding.
+- **Mobile-First UI**: Optimized every component for a 100% mobile WebView experience, transitioning from a bottom bar to a top-level scrolling tab bar for navigation, utilizing glassmorphism, and respecting safe-area padding.
+- **Combined Feed**: Merged static Polls directly into the chronological Live Feed for higher visibility and interaction, removing the standalone Polls route.
 - **Security Cleanup**: Removed the "Admin/Creator" dashboard from the frontend to ensure regular users only see driver-centric features.
 
 ## 📁 Key Files
@@ -45,9 +46,8 @@ Building **TrackX Community**, a premium, high-performance social hub for the Tr
 - **Hexbin Experiment**: We tested a Deck.gl Hexbin visualization but decided to remove it to keep the UI clean and performant; sticking to pure **Marker Clusters** for now.
 
 ## 🚀 Immediate Next Steps
-1. **Garage / Profile Page**: Implement the 4th tab to allow users to see their own car specs, history, and achievements.
-2. **Proximity Alerts (Radar)**: Build a system to notify users when high-ranked drivers or friends are nearby on the map.
-3. **Real Data Integration**: Migrate the simulation `useEffect` in `AppContent` to call a real backend API for live telemetry and community posts.
+1. **Proximity Alerts (Radar)**: Build a system to notify users when high-ranked drivers or friends are nearby on the map.
+2. **Real Data Integration**: Migrate the simulation `useEffect` in `AppContent` to call a real backend API for live telemetry and community posts.
 
 ## 🔌 Backend API Integration Plan (Pending)
 - **Current User Profile**: Data model including `userId`, `username`, `rank` (tier, points), and `garage` (vehicle details). Needs auth token via WebView bridge.
