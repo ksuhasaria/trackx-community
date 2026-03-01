@@ -85,12 +85,12 @@ export const SystemFeedCard = ({ item, onReact }: { item: FeedItem, onReact: (id
                 );
             case 'road_warrior':
                 return (
-                    <div style={{ marginTop: '16px', background: 'linear-gradient(90deg, #1e1b4b 0%, #312e81 100%)', borderRadius: '16px', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ marginTop: '16px', background: 'linear-gradient(90deg, #052e16 0%, #14532d 100%)', borderRadius: '16px', padding: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white', lineHeight: '1' }}>350<span style={{ fontSize: '1.2rem', color: '#a5b4fc' }}>km</span></div>
-                            <div style={{ fontSize: '0.8rem', color: '#818cf8', fontWeight: 600, marginTop: '4px', letterSpacing: '1px' }}>SINGLE TRIP DISTANCE</div>
+                            <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'white', lineHeight: '1' }}>350<span style={{ fontSize: '1.2rem', color: '#86efac' }}>km</span></div>
+                            <div style={{ fontSize: '0.8rem', color: '#4ade80', fontWeight: 600, marginTop: '4px', letterSpacing: '1px' }}>SINGLE TRIP DISTANCE</div>
                         </div>
-                        <Route size={48} color="#6366f1" opacity={0.6} />
+                        <Route size={48} color="#39ff14" opacity={0.6} />
                     </div>
                 );
             case 'smooth_operator':
@@ -134,7 +134,7 @@ export const SystemFeedCard = ({ item, onReact }: { item: FeedItem, onReact: (id
         >
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ background: 'rgba(99, 102, 241, 0.1)', borderRadius: '50%', padding: '6px' }}>
+                    <div style={{ background: 'rgba(57, 255, 20, 0.1)', borderRadius: '50%', padding: '6px' }}>
                         <Activity size={16} color="var(--accent-primary)" />
                     </div>
                     <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-primary)', letterSpacing: '0.5px' }}>TRACKX INSIGHTS</span>

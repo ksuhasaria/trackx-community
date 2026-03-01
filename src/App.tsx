@@ -138,7 +138,7 @@ const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className="glass-panel"
-      style={{ padding: '2rem', marginTop: '1rem', boxShadow: '0 10px 40px rgba(99, 102, 241, 0.15)' }}
+      style={{ padding: '2rem', marginTop: '1rem', boxShadow: '0 10px 40px rgba(57, 255, 20, 0.15)' }}
     >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div className="live-badge"><div className="live-dot" /> LIVE POLL</div>
@@ -197,7 +197,7 @@ const PollView = ({ poll, onVote }: { poll: Poll, onVote: (id: string) => void }
                     top: 0,
                     left: 0,
                     height: '100%',
-                    background: 'linear-gradient(90deg, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0.1) 100%)',
+                    background: 'linear-gradient(90deg, rgba(57,255,20,0.2) 0%, rgba(57,255,20,0.1) 100%)',
                     zIndex: 1
                   }}
                 />
@@ -328,7 +328,7 @@ const Leaderboard = () => {
         ))}
       </div>
 
-      <div className="glass-panel" style={{ marginTop: '24px', padding: '20px', background: 'linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(168,85,247,0.1) 100%)' }}>
+      <div className="glass-panel" style={{ marginTop: '24px', padding: '20px', background: 'linear-gradient(135deg, rgba(57,255,20,0.1) 0%, rgba(0,255,136,0.1) 100%)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Star color="#fbbf24" size={20} fill="#fbbf24" />
           <p style={{ fontSize: '0.9rem', fontWeight: 500 }}>
@@ -677,19 +677,19 @@ const AppContent: React.FC = () => {
         {/* Top Tab Navigation */}
         <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none' }}>
           <Link to="/" style={{ textDecoration: 'none' }}>
-            <div style={{ background: currentPath === '/' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/' ? 'white' : 'var(--text-secondary)' }}>
+            <div style={{ background: currentPath === '/' ? 'rgba(57, 255, 20, 0.2)' : 'transparent', border: currentPath === '/' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/' ? 'white' : 'var(--text-secondary)' }}>
               <Newspaper size={16} color={currentPath === '/' ? "var(--accent-primary)" : "currentColor"} />
               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Feed</span>
             </div>
           </Link>
           <Link to="/map" style={{ textDecoration: 'none' }}>
-            <div style={{ background: currentPath === '/map' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/map' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/map' ? 'white' : 'var(--text-secondary)' }}>
+            <div style={{ background: currentPath === '/map' ? 'rgba(57, 255, 20, 0.2)' : 'transparent', border: currentPath === '/map' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/map' ? 'white' : 'var(--text-secondary)' }}>
               <MapIcon size={16} color={currentPath === '/map' ? "var(--accent-primary)" : "currentColor"} />
               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Map</span>
             </div>
           </Link>
           <Link to="/leaderboard" style={{ textDecoration: 'none' }}>
-            <div style={{ background: currentPath === '/leaderboard' ? 'rgba(99, 102, 241, 0.2)' : 'transparent', border: currentPath === '/leaderboard' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/leaderboard' ? 'white' : 'var(--text-secondary)' }}>
+            <div style={{ background: currentPath === '/leaderboard' ? 'rgba(57, 255, 20, 0.2)' : 'transparent', border: currentPath === '/leaderboard' ? '1px solid var(--accent-primary)' : '1px solid var(--glass-border)', padding: '6px 16px', borderRadius: '100px', display: 'flex', alignItems: 'center', gap: '6px', color: currentPath === '/leaderboard' ? 'white' : 'var(--text-secondary)' }}>
               <Trophy size={16} color={currentPath === '/leaderboard' ? "var(--accent-primary)" : "currentColor"} />
               <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Ranks</span>
             </div>
@@ -710,7 +710,7 @@ const AppContent: React.FC = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
                   <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>Live Feed</h3>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <div style={{ background: 'rgba(99, 102, 241, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
+                    <div style={{ background: 'rgba(57, 255, 20, 0.1)', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-primary)' }}>TRENDING</div>
                   </div>
                 </div>
                 {feed.map(item => {

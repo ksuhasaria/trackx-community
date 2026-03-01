@@ -41,7 +41,7 @@ const DriverProfileModal: React.FC<DriverProfileModalProps> = ({ driver, onClose
                     }}
                 >
                     {/* Header Image / Cover */}
-                    <div style={{ position: 'relative', height: '250px', background: 'linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(168,85,247,0.2) 100%)' }}>
+                    <div style={{ position: 'relative', height: '250px', background: 'linear-gradient(135deg, rgba(57,255,20,0.2) 0%, rgba(0,255,136,0.2) 100%)' }}>
                         <img
                             src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&h=400&fit=crop"
                             alt="Car Cover"

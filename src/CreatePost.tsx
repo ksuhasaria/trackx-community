@@ -36,7 +36,7 @@ const CreatePost: React.FC<CreatePostProps> = ({ onPost }) => {
                     background: 'linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%)',
                     color: 'white',
                     border: 'none',
-                    boxShadow: '0 8px 30px rgba(99, 102, 241, 0.4)',
+                    boxShadow: '0 8px 30px rgba(57, 255, 20, 0.4)',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
