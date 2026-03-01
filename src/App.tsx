@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Newspaper, BarChart2, Map as MapIcon, Radio, Trophy, Timer, Star, CheckCircle, ThumbsUp, Flame, Megaphone } from 'lucide-react';
+import { Newspaper, Map as MapIcon, Radio, Trophy, Timer, Star, CheckCircle, ThumbsUp, Flame, Megaphone } from 'lucide-react';
 import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import './index.css';
